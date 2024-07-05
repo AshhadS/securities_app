@@ -79,8 +79,6 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-  const { id } = req.params;
-
   try {
     const user = await User.findByPk(id);
 
