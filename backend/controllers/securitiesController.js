@@ -4,14 +4,14 @@ const db = require('../config/db');
 
 
 exports.fetchSecurityTransactions = async (req, res) => {
-  const { page, sortField, sortOrder } = req.query;
+  const { page, sortField, sortOrder, search } = req.query;
 
   
   // const page = 1;
   const pageSize = 10;
   // const sortField = 'TRADE_DATE';
   // const sortOrder = 'ASC';
-  const search = '';
+  // const search = '';
   const filters = {};
 
   const offset = (page - 1) * pageSize;

@@ -5,6 +5,47 @@
         label="Search"
         class="mb-4"
       ></v-text-field>
+
+      <v-form @submit.prevent="fetchData">
+        <v-row>
+          <v-col cols="12" md="2">
+            <v-text-field
+              v-model="filters.fromDate"
+              label="From Date"
+              type="date"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-text-field
+              v-model="filters.toDate"
+              label="To Date"
+              type="date"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-text-field
+              v-model="filters.portfolioNumber"
+              label="Portfolio Number"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-text-field
+              v-model="filters.shareSymbol"
+              label="Share Symbol"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-text-field
+              v-model="filters.securityCurrency"
+              label="Security Currency"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="2">
+            <v-btn type="submit" color="primary">Filter</v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
+      
       <v-data-table
         :headers="headers"
         :items="transactions"
@@ -42,6 +83,13 @@
           itemsPerPage: 10,
           sortBy: [],
           sortDesc: [],
+        },
+        filters: {
+          fromDate: '',
+          toDate: '',
+          portfolioNumber: '',
+          shareSymbol: '',
+          securityCurrency: '',
         },
         pagination: {},
         transactions: [],
@@ -116,10 +164,27 @@
           trans.PROF_LOSS_SEC_CCY
         ]);
 
+         // Add a title
+        doc.setFontSize(12);  
+        doc.text('Security Transactions', 14, 20); 
+        
+        // Add a subtitle
+        doc.setFontSize(10); 
+        doc.text(`Report generated on: ${new Date().toLocaleDateString()}`, 14, 30);  
+
         doc.autoTable({
+          startY: 40,
           head: [this.headers.filter(header => header.value !== 'actions').map(header => header.text)],
-          body: rows
+          body: rows,
+          styles: {
+            fontSize: 6, // Adjust the font size for the table body
+          },
+          headStyles: {
+            fontSize: 7, // Adjust the font size for the table header
+          },
         });
+
+        
 
         doc.save('export_transactions.pdf');
       }

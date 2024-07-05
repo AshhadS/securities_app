@@ -36,8 +36,8 @@ const deleteUser = (id) => {
 };
 
 const getSecurityTransactions = (params) => {
-  const { page, sortField, sortOrder } = params;
-  return axios.get(`${API_URL}securities-report?page=${page}&sortField=${sortField}&sortOrder=${sortOrder}`);
+  const { page, sortField, sortOrder, search } = params;
+  return axios.get(`${API_URL}securities-report?page=${page}&sortField=${sortField}&sortOrder=${sortOrder}&search=${search}`);
 };
 
 export default {
