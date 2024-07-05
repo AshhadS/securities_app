@@ -48,7 +48,7 @@ export default new Vuex.Store({
     },
     async fetchTransactions({ commit }, params) {
       try {
-        const response = await authService.getTransactions(params);
+        const response = await authService.getSecurityTransactions(params);
         commit('SET_TRANSACTIONS', {
           transactions: response.data.transactions,
           total: response.data.total,

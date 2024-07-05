@@ -35,7 +35,9 @@ const deleteUser = (id) => {
   return axios.delete(`${API_URL}${id}`);
 };
 
-
+const getSecurityTransactions = () => {
+  return axios.get(`${API_URL}securities-report`);
+};
 
 export default {
   register,
@@ -43,4 +45,5 @@ export default {
   getUsers,
   updateUser,
   deleteUser,
+  getSecurityTransactions,
 };

@@ -21,20 +21,13 @@
             <v-divider class="mx-4" inset vertical></v-divider>
           </v-toolbar>
         </template>
-        <template v-slot:item.actions="{ item }">
-          <v-btn icon @click="editTransaction(item)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon @click="deleteTransaction(item.RECID)">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </template>
+       
       </v-data-table>
     </v-container>
   </template>
   
   <script>
-  import { mapActions, mapGetters } from 'vuex';
+  import { mapActions } from 'vuex';
   
   export default {
     data() {
