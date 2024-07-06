@@ -7,7 +7,7 @@
               <span class="headline">Register</span>
             </v-card-title>
             <v-card-text>
-              <v-form @submit.prevent="register">
+              <v-form @submit.prevent="handleRegister">
                 <v-text-field v-model="username" label="Username" required></v-text-field>
                 <v-text-field v-model="email" label="Email" type="email" required></v-text-field>
                 <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
@@ -33,6 +33,9 @@
     },
     methods: {
       ...mapActions(['register']),
+      handleRegister() {
+        this.register({username: this.username, email: this.email, password: this.password});
+      },
     },
   };
   </script>

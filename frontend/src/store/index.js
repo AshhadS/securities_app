@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import authService from '@/services/authService';
+import router from '../router';
+
 
 Vue.use(Vuex);
 
@@ -35,6 +37,10 @@ export default new Vuex.Store({
       localStorage.setItem('token', token);
       commit('SET_USER', response.data);
       commit('SET_TOKEN', token);
+
+      if(token) {
+        router.push('/login');
+      }
     },
     async login({ commit }, user) {
       const response = await authService.login(user.email, user.password);
@@ -42,6 +48,8 @@ export default new Vuex.Store({
       localStorage.setItem('token', token);
       commit('SET_USER', response.data);
       commit('SET_TOKEN', token);
+
+      router.push('/securities');
     },
     logout({ commit }) {
       commit('LOGOUT');

@@ -7,7 +7,7 @@
               <span class="headline">Login</span>
             </v-card-title>
             <v-card-text>
-              <v-form @submit.prevent="login">
+              <v-form @submit.prevent="handleLogin">
                 <v-text-field v-model="email" label="Email" required></v-text-field>
                 <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
                 <v-btn type="submit" color="primary">Login</v-btn>
@@ -31,6 +31,10 @@
     },
     methods: {
       ...mapActions(['login']),
+
+      handleLogin() {
+        this.login({email: this.email, password: this.password});
+      },
     },
   };
   </script>
