@@ -1,10 +1,8 @@
 const db = require('../config/db');
-
-
-
+const moment = require('moment');
 
 exports.fetchSecurityTransactions = async (req, res) => {
-  const { page, sortField, sortOrder, search } = req.query;
+  const { page, sortField, sortOrder, search, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency } = req.query;
 
   
   // const page = 1;
@@ -34,7 +32,24 @@ exports.fetchSecurityTransactions = async (req, res) => {
     }
   }
 
-  const whereClause = whereConditions.length ? `WHERE ${whereConditions.join(' AND ')}` : '';
+  if(fromDate && toDate) {
+    startDate = moment(fromDate, 'YYYY-MM-DD').format('DD/MM/YYYY');
+    endtDate = moment(toDate, 'YYYY-MM-DD').format('DD/MM/YYYY');
+
+    const date_query = `(STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') BETWEEN STR_TO_DATE('${startDate}', '%d/%m/%Y') AND STR_TO_DATE('${endtDate}', '%d/%m/%Y'))`
+    whereConditions.push(date_query);
+  }
+
+  if(portfolioNumber) 
+    whereConditions.push(`ST.SECURITY_ACCOUNT = '${portfolioNumber}'`);
+
+  if(shareSymbol) 
+    whereConditions.push(`ST.SECURITY_NUMBER = '${shareSymbol}'`);
+
+  if(securityCurrency) 
+    whereConditions.push(`ST.SECURITY_CURRENCY = '${securityCurrency}'`);
+
+  let whereClause = whereConditions.length ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
   const dataQuery = `
     SELECT ST.TRADE_DATE, ST.SECURITY_ACCOUNT, SAM.ACCOUNT_NAME, ST.SECURITY_NUMBER, SM.SHORT_NAME, ST.TRANS_TYPE, ST.RECID, ST.NO_NOMINAL, ST.PRICE, ST.NET_AMT_TRADE, ST.BROKER_COMMS, ST.PROF_LOSS_SEC_CCY
@@ -42,9 +57,10 @@ exports.fetchSecurityTransactions = async (req, res) => {
     LEFT JOIN security_master AS SM ON ST.SECURITY_NUMBER = SM.YSM_ID
     LEFT JOIN sec_acc_master AS SAM ON ST.SECURITY_ACCOUNT = SAM.RECID
     ${whereClause}
-    ORDER BY ${sortField} ${sortOrder}
+    ORDER BY STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') ASC
     LIMIT ${pageSize} OFFSET ${offset}
   `;
+    // ORDER BY ${sortField} ${sortOrder}
 
   const countQuery = `
     SELECT COUNT(*) AS total

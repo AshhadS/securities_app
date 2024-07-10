@@ -41,7 +41,7 @@
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="2">
-            <v-btn type="submit" color="primary">Filter</v-btn>
+            <v-btn type="submit" color="primary" @click="handleFilter">Filter</v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -109,6 +109,7 @@
           { text: 'Profit/Loss Sec Ccy', value: 'PROF_LOSS_SEC_CCY' },
           { text: 'Actions', value: 'actions', sortable: false },
         ],
+        defaultDate: '2024-01-01'
       };
     },
     methods: {
@@ -123,6 +124,11 @@
             sortField: sortBy.length > 0 ? sortBy[0] : 'TRADE_DATE',
             sortOrder: sortDesc.length > 0 && sortDesc[0] ? 'DESC' : 'ASC',
             search: this.search,
+            fromDate: this.filters.fromDate,
+            toDate: this.filters.toDate,
+            portfolioNumber: this.filters.portfolioNumber,
+            shareSymbol: this.filters.shareSymbol,
+            securityCurrency: this.filters.securityCurrency,
           };
           const { data, total } = await this.fetchTransactions(params);
           this.transactions = data;
@@ -187,6 +193,10 @@
         
 
         doc.save('export_transactions.pdf');
+      },
+
+      handleFilter() {
+        this.fetchData();
       }
     },
     mounted() {

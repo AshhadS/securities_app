@@ -30,8 +30,26 @@ const deleteUser = (id) => {
 };
 
 const getSecurityTransactions = (params) => {
-  const { page, sortField, sortOrder, search } = params;
-  return axios.get(`${API_URL}securities-report?page=${page}&sortField=${sortField}&sortOrder=${sortOrder}&search=${search}`);
+  const { page, sortField, sortOrder, search, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency } = params;
+
+  let url = `${API_URL}securities-report?page=${page}&sortField=${sortField}&sortOrder=${sortOrder}&search=${search}`;
+  
+  if(fromDate) 
+    url += `&fromDate=${fromDate}`;
+
+  if(toDate) 
+    url += `&toDate=${toDate}`;
+
+  if(portfolioNumber) 
+    url += `&portfolioNumber=${portfolioNumber}`;
+  
+  if(shareSymbol) 
+    url += `&shareSymbol=${shareSymbol}`;
+  
+  if(securityCurrency) 
+    url += `&securityCurrency=${securityCurrency}`;
+
+  return axios.get(url);
 };
 
 export default {
