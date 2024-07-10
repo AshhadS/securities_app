@@ -30,7 +30,8 @@ const deleteUser = (id) => {
 };
 
 const getSecurityTransactions = (params) => {
-  const { page, sortField, sortOrder, search, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency } = params;
+  console.log(params);
+  const { page, sortField, sortOrder, search, pageSize, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency } = params;
 
   let url = `${API_URL}securities-report?page=${page}&sortField=${sortField}&sortOrder=${sortOrder}&search=${search}`;
   
@@ -48,6 +49,10 @@ const getSecurityTransactions = (params) => {
   
   if(securityCurrency) 
     url += `&securityCurrency=${securityCurrency}`;
+
+  if(pageSize)
+    url += `&itemsPerPage=${pageSize}`;
+
 
   return axios.get(url);
 };

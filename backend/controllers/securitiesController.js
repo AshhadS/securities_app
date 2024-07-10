@@ -2,11 +2,11 @@ const db = require('../config/db');
 const moment = require('moment');
 
 exports.fetchSecurityTransactions = async (req, res) => {
-  const { page, sortField, sortOrder, search, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency } = req.query;
+  const { page, sortField, sortOrder, search, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency, itemsPerPage } = req.query;
 
   
   // const page = 1;
-  const pageSize = 10;
+  const pageSize = (itemsPerPage>0)?itemsPerPage:10;
   // const sortField = 'TRADE_DATE';
   // const sortOrder = 'ASC';
   // const search = '';

@@ -2,7 +2,7 @@
     <v-container>
       <v-text-field
         v-model="search"
-        label="Search"
+        label="Type any value to search here.."
         class="mb-4"
       ></v-text-field>
 
@@ -83,8 +83,12 @@
           itemsPerPage: 10,
           sortBy: [],
           sortDesc: [],
+          itemsPerPageOptions: [10, 20, 30]
         },
         filters: {
+          // fromDate: '2004-01-01',
+          // toDate: '2004-01-31',
+          
           fromDate: '',
           toDate: '',
           portfolioNumber: '',
@@ -137,20 +141,10 @@
           this.loading = false;
         }
       },
-      editTransaction(item) {
-        console.log('Edit transaction:', item);
-      },
-      deleteTransaction(id) {
-        console.log('Delete transaction with ID:', id);
-        // Implement delete functionality here
-      },
-      onPageChange(pagination) {
-        this.options.page = pagination.page;
-        this.fetchData();
-      },
       handleOptionsUpdate(newOptions) {
         // Handle sorting changes
         this.options = newOptions;
+        console.log(newOptions);
         this.fetchData();
       },
       exportToPdf() {
@@ -173,10 +167,14 @@
          // Add a title
         doc.setFontSize(12);  
         doc.text('Security Transactions', 14, 20); 
+
+        let fromD = this.filters.fromDate?this.filters.fromDate:'-';
+        let toD = this.filters.toDate?this.filters.toDate:'-';
+        let subtitle = `Statement of Transaction by Date/Currency - From Date: ${fromD} To: ${toD}`
         
         // Add a subtitle
         doc.setFontSize(10); 
-        doc.text(`Report generated on: ${new Date().toLocaleDateString()}`, 14, 30);  
+        doc.text(subtitle, 14, 30);  
 
         doc.autoTable({
           startY: 40,
@@ -189,8 +187,6 @@
             fontSize: 7, // Adjust the font size for the table header
           },
         });
-
-        
 
         doc.save('export_transactions.pdf');
       },
