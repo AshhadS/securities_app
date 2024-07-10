@@ -86,9 +86,6 @@
           itemsPerPageOptions: [10, 20, 30]
         },
         filters: {
-          // fromDate: '2004-01-01',
-          // toDate: '2004-01-31',
-          
           fromDate: '',
           toDate: '',
           portfolioNumber: '',

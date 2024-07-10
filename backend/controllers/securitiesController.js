@@ -4,12 +4,7 @@ const moment = require('moment');
 exports.fetchSecurityTransactions = async (req, res) => {
   const { page, sortField, sortOrder, search, fromDate, toDate, portfolioNumber, shareSymbol, securityCurrency, itemsPerPage } = req.query;
 
-  
-  // const page = 1;
   const pageSize = (itemsPerPage>0)?itemsPerPage:10;
-  // const sortField = 'TRADE_DATE';
-  // const sortOrder = 'ASC';
-  // const search = '';
   const filters = {};
 
   const offset = (page - 1) * pageSize;
@@ -51,16 +46,22 @@ exports.fetchSecurityTransactions = async (req, res) => {
 
   let whereClause = whereConditions.length ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
+  let order_query = "";
+  if(sortField == "TRADE_DATE") {
+    order_query = `ORDER BY STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') ${sortOrder}`;
+  } else {
+    order_query = `ORDER BY ${sortField} ${sortOrder}`;
+  }
+
   const dataQuery = `
     SELECT ST.TRADE_DATE, ST.SECURITY_ACCOUNT, SAM.ACCOUNT_NAME, ST.SECURITY_NUMBER, SM.SHORT_NAME, ST.TRANS_TYPE, ST.RECID, ST.NO_NOMINAL, ST.PRICE, ST.NET_AMT_TRADE, ST.BROKER_COMMS, ST.PROF_LOSS_SEC_CCY
     FROM security_transactions AS ST
     LEFT JOIN security_master AS SM ON ST.SECURITY_NUMBER = SM.YSM_ID
     LEFT JOIN sec_acc_master AS SAM ON ST.SECURITY_ACCOUNT = SAM.RECID
     ${whereClause}
-    ORDER BY STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') ASC
+    ${order_query}
     LIMIT ${pageSize} OFFSET ${offset}
   `;
-    // ORDER BY ${sortField} ${sortOrder}
 
   const countQuery = `
     SELECT COUNT(*) AS total
