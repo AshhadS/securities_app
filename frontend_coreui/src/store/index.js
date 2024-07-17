@@ -38,7 +38,7 @@ const store = new Vuex.Store({
       commit('setUser', response.data);
     },
     async createUser({ dispatch }, user) {
-      await axios.post(`${server_url}/api/users`, user);
+      await axios.post(`${server_url}/api/users/register`, user);
       dispatch('fetchUsers');
     },
     async updateUser({ dispatch }, user) {

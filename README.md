@@ -41,7 +41,7 @@ The backend will be running on http://localhost:5000
 Front End Setup
 ---------------
 
-Import React Dependancies
+Import Vue Dependancies
 ```bash
 cd frontend
 
@@ -66,7 +66,7 @@ Pages
 CoreUI Front End Setup
 ---------------
 
-Import React Dependancies
+Import Vue Dependancies
 ```bash
 cd frontend_coreui
 

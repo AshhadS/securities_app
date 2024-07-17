@@ -15,22 +15,50 @@
             <td>{{ user.email }}</td>
             <td>
               <button @click="$router.push(`/users/${user.id}`)" class="btn btn-info mr-2">Edit</button>
-              <button @click="deleteUser(user.id)" class="btn btn-danger">Delete</button>
+              <button @click="showDeleteConfirmation(user.id)" class="btn btn-danger">Delete</button>
             </td>
           </tr>
         </tbody>
       </table>
+      <!-- Confirmation Modal -->
+      <ConfirmationModal
+        :visible="showConfirmation"
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this user?"
+        @confirm="deleteUser(selectedUserId)"
+        @close="cancelDelete"
+      />
     </div>
   </template>
   
   <script>
+  import ConfirmationModal from './ConfirmationModal.vue';
+  
   export default {
+    data() {
+      return {
+        showConfirmation: false,
+        selectedUserId: null
+      };
+    },
+    
     computed: {
       users() {
         return this.$store.getters.users;
       },
     },
+    components: {
+      ConfirmationModal
+    },
     methods: {
+      showDeleteConfirmation(userId) {
+        this.selectedUserId = userId;
+        this.showConfirmation = true;
+      },
+      cancelDelete() {
+        this.selectedUserId = null;
+        this.showConfirmation = false;
+      },
       deleteUser(id) {
         this.$store.dispatch('deleteUser', id);
       },
