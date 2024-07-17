@@ -4,6 +4,7 @@ import CoreuiVue from '@coreui/vue';
 import '@coreui/coreui/dist/css/coreui.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import router from './router';
+import store from './store';
 import axios from 'axios';
 
 Vue.config.productionTip = false;
@@ -26,6 +27,7 @@ Vue.use(CoreuiVue);
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app');
 

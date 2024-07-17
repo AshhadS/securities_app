@@ -58,6 +58,17 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+
+exports.getUser = async (req, res) => {
+  try {
+  const { id } = req.params;
+  const user = await User.findByPk(id);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { username, email } = req.body;
@@ -80,6 +91,7 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
+    const { id } = req.params;
     const user = await User.findByPk(id);
 
     if (user) {
@@ -89,6 +101,7 @@ exports.deleteUser = async (req, res) => {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error:', error.message);
+    res.status(500).json({ message: 'Server error', error: error });
   }
 };

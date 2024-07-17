@@ -55,9 +55,24 @@ npm run serve
 
 The front end will be accessible at http://localhost:8080/
 
-
 Pages
 - Login http://localhost:8080/login
 - Register http://localhost:8080/register
 - Users List http://localhost:8080/users
 - Securities Table http://localhost:8080/securities
+
+
+
+CoreUI Front End Setup
+---------------
+
+Import React Dependancies
+```bash
+cd frontend_coreui
+
+npm install
+```
+
+Run the app
+```bash
+npm run serve

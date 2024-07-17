@@ -48,7 +48,7 @@
           localStorage.setItem('token', token);
           
           // Redirect or handle successful login
-          this.$router.push('/');
+          this.$router.push('/securities');
         } catch (error) {
           console.error('Login error:', error);
           // Handle login error (show message, clear form, etc.)
