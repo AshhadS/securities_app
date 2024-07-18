@@ -12,19 +12,26 @@
       </div>
       
       <div class="form-inline mb-4">
+                
+      <div class="form-group">
+        <label for="fromDate" class="mr-2"><small>From</small> </label>
         <input
           type="date"
           class="form-control form-control-sm mr-2"
           v-model="filters.fromDate"
           placeholder="From Date"
         />
+      </div>
+      <div class="form-group">
+        <label for="toDate" class="mr-2"><small>To</small></label>
         <input
           type="date"
           class="form-control form-control-sm mr-2"
           v-model="filters.toDate"
           placeholder="To Date"
         />
-        <input
+      </div>
+      <input
           type="text"
           class="form-control form-control-sm mr-2"
           v-model="filters.portfolioNumber"
@@ -42,7 +49,8 @@
           v-model="filters.securityCurrency"
           placeholder="Security Currency"
         />
-        <button @click="updateFilters" class="btn btn-info btn-sm">Filter</button>
+        <button @click="updateFilters" class="btn btn-info btn-sm mr-2">Filter</button>
+        <button @click="clearFilters" class="btn btn-outline-info btn-sm">Clear</button>
       </div>
 
       <table class="table table-sm securities-table table-striped">
@@ -81,6 +89,7 @@
       </table>
       
       <div class="d-flex">
+        <button class="btn btn-info mr-2 btn-sm" @click="exportPDF">Export to PDF</button>
         <select class="form-control-sm form-control mr-2 items-pp ml-auto " v-model="pagination.itemsPerPage" @change="updatePagination">
           <option :value="5">5</option>
           <option :value="10">10</option>
@@ -98,6 +107,8 @@
   
   <script>
   import { mapState, mapActions } from 'vuex';
+  import jsPDF from 'jspdf';
+  import 'jspdf-autotable';
   
   export default {
     data() {
@@ -133,6 +144,16 @@
       updateFilters() {
         this.setPagination({ filters: this.filters });
       },
+      clearFilters() {
+        this.filters = {
+          fromDate: '',
+          toDate: '',
+          portfolioNumber: '',
+          shareSymbol: '',
+          securityCurrency: ''
+        };
+        this.updateFilters();
+      },
       changePage(page) {
         if (page > 0 && page <= this.totalPages) {
           this.setPagination({ page });
@@ -144,7 +165,49 @@
         } else {
           this.setPagination({ sortBy: column, sortDesc: false });
         }
-      }
+      },
+      exportPDF() {
+        const doc = new jsPDF();
+        const columns = [
+          { header: 'Trade Date', dataKey: 'TRADE_DATE' },
+          { header: 'Security Account', dataKey: 'SECURITY_ACCOUNT' },
+          { header: 'Account Name', dataKey: 'ACCOUNT_NAME' },
+          { header: 'Security Number', dataKey: 'SECURITY_NUMBER' },
+          { header: 'Short Name', dataKey: 'SHORT_NAME' },
+          { header: 'Transaction Type', dataKey: 'TRANS_TYPE' },
+          { header: 'RECID', dataKey: 'RECID' },
+          { header: 'No Nominal', dataKey: 'NO_NOMINAL' },
+          { header: 'Price', dataKey: 'PRICE' },
+          { header: 'Net Amount Trade', dataKey: 'NET_AMT_TRADE' },
+          { header: 'Broker Commissions', dataKey: 'BROKER_COMMS' },
+          { header: 'Prfit/Loss Sec CCY', dataKey: 'PROF_LOSS_SEC_CCY' },
+        ];
+
+        // Add a title
+        doc.setFontSize(12);  
+        doc.text('Security Transactions', 14, 20); 
+
+        let fromD = this.filters.fromDate?this.filters.fromDate:'-';
+        let toD = this.filters.toDate?this.filters.toDate:'-';
+        let subtitle = `Statement of Transaction by Date/Currency - From Date: ${fromD} To: ${toD}`
+        
+        // Add a subtitle
+        doc.setFontSize(10); 
+        doc.text(subtitle, 14, 30);  
+
+        doc.autoTable({
+          startY: 40,
+          head: [columns.map(col => col.header)],
+          body: this.securityData.map(data => columns.map(col => data[col.dataKey])),
+          styles: {
+            fontSize: 6, 
+          },
+          headStyles: {
+            fontSize: 7,
+          },
+        });
+        doc.save('security_data.pdf');
+      },
     },
     created() {
       this.fetchSecurityData();
