@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.post('/login', authUser);
 router.get('/', getUsers);
-router.get('/:id', getUser);
+router.get('/user/:id', getUser);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 router.get('/securities-report', fetchSecurityTransactions);
