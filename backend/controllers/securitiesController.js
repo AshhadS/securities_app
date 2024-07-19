@@ -15,6 +15,13 @@ exports.fetchSecurityTransactions = async (req, res) => {
       (ST.SECURITY_ACCOUNT LIKE '%${search}%' OR
        SAM.ACCOUNT_NAME LIKE '%${search}%' OR
        ST.SECURITY_NUMBER LIKE '%${search}%' OR
+       ST.TRANS_TYPE LIKE '%${search}%' OR
+       ST.RECID LIKE '%${search}%' OR
+       ST.NO_NOMINAL LIKE '%${search}%' OR
+       ST.PRICE LIKE '%${search}%' OR
+       ST.NET_AMT_TRADE LIKE '%${search}%' OR
+       ST.BROKER_COMMS LIKE '%${search}%' OR
+       ST.PROF_LOSS_SEC_CCY LIKE '%${search}%' OR
        SM.SHORT_NAME LIKE '%${search}%')
     `);
   }
@@ -27,13 +34,18 @@ exports.fetchSecurityTransactions = async (req, res) => {
     }
   }
 
-  if(fromDate && toDate) {
+  if(fromDate) {
     startDate = moment(fromDate, 'YYYY-MM-DD').format('DD/MM/YYYY');
-    endtDate = moment(toDate, 'YYYY-MM-DD').format('DD/MM/YYYY');
-
-    const date_query = `(STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') BETWEEN STR_TO_DATE('${startDate}', '%d/%m/%Y') AND STR_TO_DATE('${endtDate}', '%d/%m/%Y'))`
+    const date_query = `(STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') >= STR_TO_DATE('${startDate}', '%d/%m/%Y'))`
     whereConditions.push(date_query);
   }
+
+  if(toDate) {
+    endtDate = moment(toDate, 'YYYY-MM-DD').format('DD/MM/YYYY');
+    const date_query = `(STR_TO_DATE(ST.TRADE_DATE, '%d/%m/%Y') <= STR_TO_DATE('${endtDate}', '%d/%m/%Y'))`
+    whereConditions.push(date_query);
+  }
+
 
   if(portfolioNumber) 
     whereConditions.push(`ST.SECURITY_ACCOUNT = '${portfolioNumber}'`);

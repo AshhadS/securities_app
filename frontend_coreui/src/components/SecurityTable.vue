@@ -1,20 +1,21 @@
 <template>
-    <div>
-      <h2 class="mb-4">Security Data</h2>
+    <div class="mb-5">
+      <h4 class="mb-4">Security Data</h4>
       <div class="mb-4">
         <input
           type="text"
           class="form-control form-control-sm"
           v-model="pagination.search"
-          placeholder="Search"
+          placeholder="Start typing to search"
           @input="updatePagination"
         />
+        <small class="form-text text-muted">Search by any field in the table here</small>
       </div>
       
       <div class="form-inline mb-4">
                 
       <div class="form-group">
-        <label for="fromDate" class="mr-2"><small>From</small> </label>
+        <label for="fromDate" class="mr-1"><small>From</small> </label>
         <input
           type="date"
           class="form-control form-control-sm mr-2"
@@ -23,7 +24,7 @@
         />
       </div>
       <div class="form-group">
-        <label for="toDate" class="mr-2"><small>To</small></label>
+        <label for="toDate" class="mr-1"><small>To</small></label>
         <input
           type="date"
           class="form-control form-control-sm mr-2"
@@ -53,21 +54,22 @@
         <button @click="clearFilters" class="btn btn-outline-info btn-sm">Clear</button>
       </div>
 
+      <LoadingIndicator :loading="this.loading" />
       <table class="table table-sm securities-table table-striped">
         <thead>
           <tr>
-            <th @click="sortBy('TRADE_DATE')">Trade Date</th>
-            <th @click="sortBy('SECURITY_ACCOUNT')">Security Account</th>
-            <th @click="sortBy('ACCOUNT_NAME')">Account Name</th>
-            <th @click="sortBy('SECURITY_NUMBER')">Security Number</th>
-            <th @click="sortBy('SHORT_NAME')">Short Name</th>
-            <th @click="sortBy('TRANS_TYPE')">Transaction Type</th>
-            <th @click="sortBy('RECID')">RECID</th>
-            <th @click="sortBy('NO_NOMINAL')">No Nominal</th>
-            <th @click="sortBy('PRICE')">Price</th>
-            <th @click="sortBy('NET_AMT_TRADE')">Net Amount Trade</th>
-            <th @click="sortBy('BROKER_COMMS')">Broker Commissions</th>
-            <th @click="sortBy('PROF_LOSS_SEC_CCY')">Prfit/Loss Sec CCY</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('TRADE_DATE') }" @click="sortBy('TRADE_DATE')">Trade Date</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('SECURITY_ACCOUNT') }" @click="sortBy('SECURITY_ACCOUNT')">Security Account</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('ACCOUNT_NAME') }" @click="sortBy('ACCOUNT_NAME')">Account Name</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('SECURITY_NUMBER') }" @click="sortBy('SECURITY_NUMBER')">Security Number</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('SHORT_NAME') }" @click="sortBy('SHORT_NAME')">Short Name</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('TRANS_TYPE') }" @click="sortBy('TRANS_TYPE')">Transaction Type</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('RECID') }" @click="sortBy('RECID')">RECID</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('NO_NOMINAL') }" @click="sortBy('NO_NOMINAL')">No Nominal</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('PRICE') }" @click="sortBy('PRICE')">Price</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('NET_AMT_TRADE') }" @click="sortBy('NET_AMT_TRADE')">Net Amount Trade</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('BROKER_COMMS') }" @click="sortBy('BROKER_COMMS')">Broker Commissions</th>
+            <th role="button" :class="{isDesc: this.pagination.sortOrder, sorted: this.isSorted('PROF_LOSS_SEC_CCY') }" @click="sortBy('PROF_LOSS_SEC_CCY')">Prfit/Loss Sec CCY</th>
           </tr>
         </thead>
         <tbody>
@@ -98,9 +100,8 @@
         <div class="d-flex flex-row pagination align-items-center">
           <button class="btn btn-info mr-2 btn-sm" @click="changePage(pagination.page - 1)" :disabled="pagination.page === 1">{{"<"}}</button>
           <span class="mr-2 current-page">Page {{ pagination.page }}</span>
-          <button class="btn btn-info btn-sm" @click="changePage(pagination.page + 1)" :disabled="pagination.page >= totalPages">{{">"}}</button>
+          <button class="btn btn-info btn-sm" @click="changePage(pagination.page + 1)" :disabled="disableNext()">{{">"}}</button>
         </div>
-
       </div>
     </div>
   </template>
@@ -109,6 +110,7 @@
   import { mapState, mapActions } from 'vuex';
   import jsPDF from 'jspdf';
   import 'jspdf-autotable';
+  import LoadingIndicator from './LoadingIndicator';
   
   export default {
     data() {
@@ -119,9 +121,13 @@
           toDate: '',
           portfolioNumber: '',
           shareSymbol: '',
-          securityCurrency: ''
+          securityCurrency: '',
+          search: ''
         }
       };
+    },
+    components: {
+      LoadingIndicator
     },
     computed: {
       ...mapState({
@@ -142,6 +148,7 @@
         this.setPagination(this.pagination);
       },
       updateFilters() {
+        this.changePage(1);
         this.setPagination({ filters: this.filters });
       },
       clearFilters() {
@@ -152,19 +159,40 @@
           shareSymbol: '',
           securityCurrency: ''
         };
+        this.pagination.search = '';
         this.updateFilters();
       },
       changePage(page) {
-        if (page > 0 && page <= this.totalPages) {
+        const allPages = Math.ceil(this.totalData / this.pagination.itemsPerPage);
+
+        if (page > 0 && page <= allPages) {
           this.setPagination({ page });
         }
       },
       sortBy(column) {
-        if (this.pagination.sortBy === column) {
-          this.setPagination({ sortDesc: !this.pagination.sortDesc });
+        if (this.pagination.sortField === column) {
+          this.setPagination({ sortOrder: !this.pagination.sortOrder });
         } else {
-          this.setPagination({ sortBy: column, sortDesc: false });
+          this.setPagination({ sortField: column, sortOrder: false });
         }
+      },
+      isSorted(column) {
+        return this.pagination.sortField == column;
+      },
+      disableNext() {
+        
+        // Doesn't have items to paginate - No items more than items per page
+        if(this.totalData < this.pagination.itemsPerPage) {
+          return true; // disable next
+        } 
+
+        // Has multiple pages - reached the end of all pages
+        const allPages = Math.ceil(this.totalData / this.pagination.itemsPerPage);
+        if(this.pagination.page >= allPages) {
+          return true; // disable next
+        }
+        
+        return false; // fallback enable other scenarios
       },
       exportPDF() {
         const doc = new jsPDF();
@@ -228,5 +256,25 @@
   .items-pp {
     max-width: 55px;
   }
+
+  th.sorted,
+  th:hover {
+    color: grey;
+  }
+
+  th.sorted::after {
+    content: "^";
+    right: -2px;
+    position: relative;
+  }
+
+  th.isDesc.sorted::after {
+    color: #000;
+    display: inline-block;
+    -webkit-transform: rotateX(180deg);
+    transform: rotateX(180deg); 
+    top: -3px;
+  }
+
   </style>
   

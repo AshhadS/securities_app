@@ -14,7 +14,8 @@
           <label for="password">Password</label>
           <input type="password" v-model="user.password" class="form-control" id="password" placeholder="Password" required />
         </div>
-        <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Create' }}</button>
+        <button type="submit" class="btn btn-primary mr-2">{{ isEditMode ? 'Update' : 'Create' }}</button>
+        <button type="submit" class="btn btn-secondary" @click="handleCancel">Cancel</button>
       </form>
     </div>
   </template>
@@ -44,6 +45,9 @@
         }
         this.$router.push('/users');
       },
+      handleCancel() {
+        this.$router.push('/users');
+      }
     },
     async created() {
       if (this.isEditMode) {

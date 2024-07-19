@@ -14,16 +14,17 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link class="nav-link" to="/">Home</router-link>
+            <router-link class="nav-link" v-if="isAuthenticated" to="/securities">Securities</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" v-if="isAuthenticated" to="/users">Users</router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" v-if="isAuthenticated" to="/securities">Securities</router-link>
-          </li>
+        </ul>
+      </div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
           <li class="nav-item" v-if="!isAuthenticated">
             <router-link class="nav-link" to="/login">Login</router-link>
           </li>

@@ -18,7 +18,7 @@ const store = new Vuex.Store({
       page: 1,
       itemsPerPage: 10,
       sortField: "TRADE_DATE",
-      sortOrder: "ASC",
+      sortOrder: false,
       search: '',
       filters: {
         fromDate: '',
@@ -40,16 +40,16 @@ const store = new Vuex.Store({
       state.users = users;
     },
     SET_SECURITY_DATA(state, data) {
-    state.securityData = data;
+      state.securityData = data;
     },
     SET_TOTAL_DATA(state, total) {
-    state.totalData = total;
+      state.totalData = total;
     },
     SET_LOADING(state, loading) {
-    state.loading = loading;
+      state.loading = loading;
     },
     SET_PAGINATION(state, pagination) {
-    state.pagination = { ...state.pagination, ...pagination };
+      state.pagination = { ...state.pagination, ...pagination };
     }
   },
   actions: {
@@ -81,13 +81,15 @@ const store = new Vuex.Store({
     fetchSecurityData({ commit, state }) {
       commit('SET_LOADING', true);
       const { page, itemsPerPage, sortField, sortOrder, search, filters } = state.pagination;
+      const isDesc = (sortOrder)?"DESC":"ASC";
+
       axios
       .get(`${server_url}/api/users/securities-report`, {
         params: {
           page,
           itemsPerPage: itemsPerPage,
           sortField,
-          sortOrder,
+          sortOrder: isDesc,
           search,
           fromDate: filters.fromDate,
           toDate: filters.toDate,
@@ -97,6 +99,7 @@ const store = new Vuex.Store({
         }
       })
       .then(response => {
+
         commit('SET_SECURITY_DATA', response.data.transactions);
         commit('SET_TOTAL_DATA', response.data.total);
       })

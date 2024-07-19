@@ -1,7 +1,10 @@
 <template>
     <div>
-      <button @click="$router.push('/users/new')" class="btn btn-primary">Add User</button>
-      <table class="table table-striped mt-4">
+      <div class="">
+        <h4 class="mb-4">Users List</h4>
+        <button @click="$router.push('/users/new')" class="btn btn-info"> + Add User</button>
+      </div>
+      <table class="table table-striped mt-4 table-sm">
         <thead>
           <tr>
             <th>Username</th>
@@ -14,8 +17,8 @@
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td>
-              <button @click="$router.push(`/users/${user.id}`)" class="btn btn-info mr-2">Edit</button>
-              <button @click="showDeleteConfirmation(user.id)" class="btn btn-danger">Delete</button>
+              <button @click="$router.push(`/users/${user.id}`)" class="btn btn-sm btn-info mr-2">Edit</button>
+              <button @click="showDeleteConfirmation(user.id)" class="btn btn-sm btn-danger">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -61,6 +64,8 @@
       },
       deleteUser(id) {
         this.$store.dispatch('deleteUser', id);
+        this.selectedUserId = null;
+        this.showConfirmation = false;
       },
     },
     created() {
